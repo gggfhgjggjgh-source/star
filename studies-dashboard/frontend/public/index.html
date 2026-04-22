@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#1a1410" />
+        <meta name="description" content="لوحة الدراسات - نظام إدارة درجات الطلاب لمادة الدراسات الاجتماعية" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+        <link rel="stylesheet" href="%PUBLIC_URL%/styles.css" />
+        <title>لوحة الدراسات | الدراسات الاجتماعية</title>
+        <script>window.__API_BASE__ = "%REACT_APP_BACKEND_URL%";</script>
+        <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
+    </head>
+    <body>
+        <noscript>يجب تفعيل JavaScript لتشغيل هذا التطبيق.</noscript>
+
+        <!-- Background ornaments -->
+        <div class="bg-grain" aria-hidden="true"></div>
+        <div class="bg-orb bg-orb-1" aria-hidden="true"></div>
+        <div class="bg-orb bg-orb-2" aria-hidden="true"></div>
+
+        <header class="site-header" data-testid="site-header">
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                </div>
+                <div class="brand-text">
+                    <h1 class="brand-title">لوحة الدراسات</h1>
+                    <p class="brand-sub">إدارة درجات طلاب الدراسات الاجتماعية</p>
+                </div>
+            </div>
+
+            <nav class="tabs" role="tablist" aria-label="التنقل">
+                <button class="tab-btn is-active" data-tab="honor" role="tab" data-testid="tab-honor">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span>لوحة الشرف</span>
+                </button>
+                <button class="tab-btn" data-tab="student" role="tab" data-testid="tab-student">
+                    <i class="fa-solid fa-id-card"></i>
+                    <span>نتيجتي</span>
+                </button>
+                <button class="tab-btn" data-tab="teacher" role="tab" data-testid="tab-teacher">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <span>لوحة المعلم</span>
+                </button>
+            </nav>
+        </header>
+
+        <main class="container">
+            <!-- ============ Honor Board (Students View) ============ -->
+            <section class="view view-honor is-active" data-view="honor" data-testid="view-honor">
+                <div class="section-intro">
+                    <span class="eyebrow">المراكز الشهرية</span>
+                    <h2 class="section-title">لوحة الشرف<span class="title-dot">.</span></h2>
+                    <p class="section-desc">ترتيب الطلاب حسب الرصيد الإجمالي — النجوم ناقص النقاط السالبة.</p>
+                </div>
+
+                <!-- Top 3 podium -->
+                <div class="podium" id="podium" data-testid="podium">
+                    <!-- filled by JS -->
+                </div>
+
+                <!-- Rest of the list -->
+                <div class="leaderboard" data-testid="leaderboard-wrap">
+                    <div class="leaderboard-head">
+                        <h3><i class="fa-solid fa-list-ol"></i> بقية الطلاب</h3>
+                        <button class="ghost-btn" id="refreshBtn" data-testid="refresh-btn">
+                            <i class="fa-solid fa-rotate"></i>
+                            تحديث
+                        </button>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="leaderboard-table" data-testid="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th class="th-rank">المركز</th>
+                                    <th class="th-name">الاسم</th>
+                                    <th class="th-stars">النجوم</th>
+                                    <th class="th-neg">السالبة</th>
+                                    <th class="th-balance">الرصيد</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardBody">
+                                <!-- filled by JS -->
+                            </tbody>
+                        </table>
+                        <div class="empty-state" id="emptyState" hidden>
+                            <i class="fa-regular fa-folder-open"></i>
+                            <p>لا يوجد طلاب بعد. انتقل إلى <strong>لوحة المعلم</strong> لإضافة طالب.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ Student Login / My Result ============ -->
+            <section class="view view-student" data-view="student" data-testid="view-student">
+                <div class="section-intro">
+                    <span class="eyebrow">للطالب</span>
+                    <h2 class="section-title">نتيجتي<span class="title-dot">.</span></h2>
+                    <p class="section-desc">أدخل الكود الخاص بك (9 أرقام) لعرض رصيدك ونجومك. لا يمكنك التعديل — فقط العرض.</p>
+                </div>
+
+                <div class="student-login-wrap">
+                    <div class="card login-card" data-testid="login-card">
+                        <div class="card-head">
+                            <i class="fa-solid fa-id-card"></i>
+                            <h3>الدخول بالكود</h3>
+                        </div>
+                        <form id="studentLoginForm" class="form-grid">
+                            <label class="field">
+                                <span>الكود الشخصي (9 أرقام)</span>
+                                <input type="text" id="studentLoginCode" required
+                                    placeholder="123456789"
+                                    inputmode="numeric"
+                                    pattern="\d{9}"
+                                    maxlength="9"
+                                    data-testid="input-student-login"
+                                    autocomplete="off" />
+                            </label>
+                            <button type="submit" class="primary-btn" data-testid="student-login-submit">
+                                <i class="fa-solid fa-right-to-bracket"></i>
+                                عرض نتيجتي
+                            </button>
+                        </form>
+                        <p class="form-msg" id="studentLoginMsg" role="status" data-testid="student-login-msg"></p>
+                    </div>
+
+                    <div class="result-card" id="resultCard" hidden data-testid="result-card">
+                        <div class="result-banner">
+                            <i class="fa-solid fa-medal"></i>
+                            <span>نتيجتك</span>
+                            <button class="ghost-btn logout" id="studentLogoutBtn" data-testid="student-logout-btn">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                خروج
+                            </button>
+                        </div>
+                        <div class="result-body">
+                            <span class="result-code" id="resultCodeTxt"></span>
+                            <h3 class="result-name" id="resultName" data-testid="result-name"></h3>
+                            <div class="result-balance" id="resultBalance" data-testid="result-balance">0</div>
+                            <div class="result-balance-label">الرصيد الإجمالي</div>
+                            <div class="result-stats">
+                                <div class="rstat">
+                                    <i class="fa-solid fa-star"></i>
+                                    <span class="rstat-val" id="resultStars" data-testid="result-stars">0</span>
+                                    <span class="rstat-lbl">نجوم</span>
+                                </div>
+                                <div class="rstat neg">
+                                    <i class="fa-solid fa-circle-minus"></i>
+                                    <span class="rstat-val" id="resultNegatives" data-testid="result-negatives">0</span>
+                                    <span class="rstat-lbl">سالبة</span>
+                                </div>
+                                <div class="rstat rank">
+                                    <i class="fa-solid fa-ranking-star"></i>
+                                    <span class="rstat-val" id="resultRank" data-testid="result-rank">—</span>
+                                    <span class="rstat-lbl">الترتيب</span>
+                                </div>
+                            </div>
+                            <p class="result-note">
+                                <i class="fa-solid fa-lock"></i>
+                                هذه الصفحة للعرض فقط، لا يمكنك تعديل نتيجتك.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ Teacher Dashboard ============ -->
+            <section class="view view-teacher" data-view="teacher" data-testid="view-teacher">
+                <!-- Password lock -->
+                <div class="teacher-lock" id="teacherLock" data-testid="teacher-lock">
+                    <div class="lock-inner">
+                        <div class="lock-icon"><i class="fa-solid fa-lock"></i></div>
+                        <h2 class="lock-title">لوحة المعلم</h2>
+                        <p class="lock-desc">هذه المنطقة محمية — أدخل كلمة السر للدخول.</p>
+                        <form id="teacherLoginForm" class="form-grid">
+                            <label class="field">
+                                <span>كلمة السر</span>
+                                <input type="password" id="teacherPassword" required
+                                    placeholder="••••••"
+                                    data-testid="input-teacher-password"
+                                    autocomplete="current-password" />
+                            </label>
+                            <button type="submit" class="primary-btn" data-testid="teacher-login-submit">
+                                <i class="fa-solid fa-unlock"></i>
+                                دخول
+                            </button>
+                        </form>
+                        <p class="form-msg" id="teacherLoginMsg" role="status" data-testid="teacher-login-msg"></p>
+                    </div>
+                </div>
+
+                <!-- Teacher content (hidden until unlocked) -->
+                <div class="teacher-content" id="teacherContent" hidden data-testid="teacher-content">
+                    <div class="section-intro">
+                        <div class="intro-row">
+                            <div>
+                                <span class="eyebrow">للمعلم فقط</span>
+                                <h2 class="section-title">لوحة التحكم<span class="title-dot">.</span></h2>
+                                <p class="section-desc">أضف طالباً جديداً، ابحث بالكود، ثم امنح نجوماً أو نقاطاً سالبة.</p>
+                            </div>
+                            <button class="ghost-btn" id="teacherLogoutBtn" data-testid="teacher-logout-btn">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                خروج
+                            </button>
+                        </div>
+                    </div>
+
+                <div class="grid-two">
+                    <!-- Add student card -->
+                    <div class="card card-add" data-testid="add-student-card">
+                        <div class="card-head">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <h3>إضافة طالب جديد</h3>
+                        </div>
+                        <form id="addForm" class="form-grid">
+                            <label class="field">
+                                <span>اسم الطالب</span>
+                                <input type="text" id="newName" required placeholder="مثال: محمد أحمد" data-testid="input-new-name" autocomplete="off" />
+                            </label>
+                            <button type="submit" class="primary-btn" data-testid="add-student-submit">
+                                <i class="fa-solid fa-plus"></i>
+                                إضافة وتوليد الكود
+                            </button>
+                        </form>
+                        <p class="form-msg" id="addMsg" role="status" data-testid="add-msg"></p>
+
+                        <div class="generated-code" id="generatedCode" hidden data-testid="generated-code">
+                            <span class="gc-label"><i class="fa-solid fa-key"></i> كود الطالب الخاص</span>
+                            <div class="gc-value" id="gcValue" data-testid="gc-value"></div>
+                            <button type="button" class="ghost-btn" id="copyCodeBtn" data-testid="copy-code-btn">
+                                <i class="fa-solid fa-copy"></i>
+                                نسخ الكود
+                            </button>
+                            <p class="gc-hint">شارك هذا الكود مع الطالب ليتمكن من عرض نتيجته.</p>
+                        </div>
+                    </div>
+
+                    <!-- Search & manage card -->
+                    <div class="card card-search" data-testid="search-student-card">
+                        <div class="card-head">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <h3>البحث بالكود</h3>
+                        </div>
+                        <form id="searchForm" class="form-grid">
+                            <label class="field">
+                                <span>كود الطالب</span>
+                                <input type="text" id="searchCode" required placeholder="أدخل الكود..." data-testid="input-search-code" autocomplete="off" />
+                            </label>
+                            <button type="submit" class="primary-btn outline" data-testid="search-submit">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                بحث
+                            </button>
+                        </form>
+
+                        <div class="student-panel" id="studentPanel" hidden data-testid="student-panel">
+                            <div class="panel-head">
+                                <div>
+                                    <span class="panel-code" id="panelCode"></span>
+                                    <h4 class="panel-name" id="panelName"></h4>
+                                </div>
+                                <div class="panel-balance" id="panelBalance" data-testid="panel-balance">0</div>
+                            </div>
+
+                            <div class="panel-stats">
+                                <div class="stat">
+                                    <i class="fa-solid fa-star"></i>
+                                    <span class="stat-label">النجوم</span>
+                                    <span class="stat-value" id="panelStars" data-testid="panel-stars">0</span>
+                                </div>
+                                <div class="stat neg">
+                                    <i class="fa-solid fa-circle-minus"></i>
+                                    <span class="stat-label">السالبة</span>
+                                    <span class="stat-value" id="panelNegatives" data-testid="panel-negatives">0</span>
+                                </div>
+                            </div>
+
+                            <div class="panel-actions">
+                                <div class="qty-row" data-testid="qty-row">
+                                    <label class="qty-label">
+                                        <i class="fa-solid fa-hashtag"></i>
+                                        العدد
+                                    </label>
+                                    <div class="qty-chips">
+                                        <button type="button" class="qty-chip" data-qty="1" data-testid="qty-1">1</button>
+                                        <button type="button" class="qty-chip" data-qty="3" data-testid="qty-3">3</button>
+                                        <button type="button" class="qty-chip" data-qty="5" data-testid="qty-5">5</button>
+                                        <button type="button" class="qty-chip" data-qty="10" data-testid="qty-10">10</button>
+                                    </div>
+                                    <input type="number" id="qtyInput" value="1" min="1" max="1000"
+                                        class="qty-input"
+                                        data-testid="input-qty"
+                                        aria-label="العدد" />
+                                </div>
+                                <button class="action-btn add-star" id="btnAddStar" data-testid="btn-add-star">
+                                    <i class="fa-solid fa-plus"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    نجوم
+                                </button>
+                                <button class="action-btn add-neg" id="btnAddNeg" data-testid="btn-add-neg">
+                                    <i class="fa-solid fa-minus"></i>
+                                    سالبة
+                                </button>
+                                <button class="action-btn remove-star" id="btnRemoveStar" data-testid="btn-remove-star" title="تراجع عن نجمة واحدة">
+                                    <i class="fa-solid fa-rotate-left"></i>
+                                    نجمة
+                                </button>
+                                <button class="action-btn remove-neg" id="btnRemoveNeg" data-testid="btn-remove-neg" title="تراجع عن سالبة واحدة">
+                                    <i class="fa-solid fa-rotate-left"></i>
+                                    سالبة
+                                </button>
+                                <button class="action-btn danger" id="btnDelete" data-testid="btn-delete">
+                                    <i class="fa-solid fa-trash"></i>
+                                    حذف الطالب
+                                </button>
+                            </div>
+                        </div>
+
+                        <p class="form-msg" id="searchMsg" role="status" data-testid="search-msg"></p>
+                    </div>
+                </div>
+
+                <!-- Stats overview -->
+                <div class="overview" data-testid="overview">
+                    <div class="overview-card">
+                        <i class="fa-solid fa-users"></i>
+                        <div>
+                            <span class="ov-label">إجمالي الطلاب</span>
+                            <strong class="ov-value" id="ovTotal" data-testid="ov-total">0</strong>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <i class="fa-solid fa-star"></i>
+                        <div>
+                            <span class="ov-label">مجموع النجوم</span>
+                            <strong class="ov-value" id="ovStars" data-testid="ov-stars">0</strong>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <div>
+                            <span class="ov-label">مجموع السالبة</span>
+                            <strong class="ov-value" id="ovNeg" data-testid="ov-neg">0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All students with codes (teacher-only) -->
+                <div class="all-students-wrap" data-testid="all-students">
+                    <div class="leaderboard-head">
+                        <h3><i class="fa-solid fa-table-list"></i> جميع الطلاب وأكوادهم</h3>
+                        <span class="hint-text"><i class="fa-solid fa-circle-info"></i> اضغط على أي صف لفتح التحكم فيه</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="leaderboard-table teacher-all-table" data-testid="teacher-all-table">
+                            <thead>
+                                <tr>
+                                    <th class="th-rank">المركز</th>
+                                    <th class="th-code">الكود</th>
+                                    <th class="th-name">الاسم</th>
+                                    <th class="th-stars">النجوم</th>
+                                    <th class="th-neg">السالبة</th>
+                                    <th class="th-balance">الرصيد</th>
+                                    <th class="th-actions">حذف</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teacherAllBody"></tbody>
+                        </table>
+                        <div class="empty-state" id="teacherAllEmpty" hidden>
+                            <i class="fa-regular fa-folder-open"></i>
+                            <p>لا يوجد طلاب بعد. ابدأ بإضافة طالب جديد.</p>
+                        </div>
+                    </div>
+                </div>
+                </div><!-- /.teacher-content -->
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <p>© لوحة الدراسات — مادة الدراسات الاجتماعية</p>
+        </footer>
+
+        <!-- Toast -->
+        <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+
+        <a
+            id="emergent-badge"
+            target="_blank"
+            href="https://app.emergent.sh/?utm_source=emergent-badge"
+            style="display: inline-flex !important; box-sizing: border-box; width: 178px; height: 40px; padding: 8px 12px; align-items: center !important; gap: 8px; border-radius: 50px !important; background: #000 !important; position: fixed !important; bottom: 16px; left: 16px; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-size: 12px !important; z-index: 9999 !important;"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M15.5702 8.13142C15.7729 8.0412 16.0007 8.18878 15.9892 8.4103C15.8374 11.3192 14.0965 14.0405 11.2531 15.3065C8.40964 16.5725 5.2224 16.0453 2.95912 14.2117C2.78676 14.072 2.82955 13.804 3.03219 13.7137L4.95677 12.8568C5.04866 12.8159 5.15446 12.823 5.24204 12.8725C6.73377 13.7153 8.59176 13.8649 10.2772 13.1145C11.9626 12.3641 13.0947 10.8833 13.4665 9.21075C13.4883 9.11256 13.5539 9.02918 13.6457 8.98827L15.5702 8.13142Z" fill="white"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M15.3066 4.74698L15.5067 5.19653C15.5759 5.35178 15.5061 5.53366 15.3508 5.60278L1.29992 11.8586C1.14467 11.9278 0.962794 11.8579 0.893675 11.7027L0.701732 11.2716L0.693457 11.2531C-1.10317 7.21778 0.711626 2.49007 4.74692 0.693443C8.78221 -1.10318 13.51 0.711693 15.3066 4.74698ZM2.82356 8.55367C2.63552 8.63739 2.41991 8.51617 2.40853 8.31065C2.28373 6.05724 3.53858 3.85787 5.72286 2.88536C7.90715 1.91286 10.3813 2.45199 11.9724 4.05256C12.1175 4.19854 12.0633 4.43988 11.8753 4.5236L2.82356 8.55367Z" fill="white"/>
+            </svg>
+            <p style="color:#FFF !important; font-family:'Inter', sans-serif !important; font-size:13px !important; font-weight:600 !important; line-height:20px !important; margin:0 !important; white-space:nowrap !important;">Made with Emergent</p>
+        </a>
+
+        <script src="%PUBLIC_URL%/app.js"></script>
+    </body>
+</html>
